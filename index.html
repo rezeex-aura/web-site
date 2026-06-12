@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pxlwyse</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    background:url("https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1920") center/cover;
+}
+
+body::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.65);
+}
+
+.left-glow,.right-glow{
+    position:absolute;
+    top:50%;
+    width:250px;
+    height:250px;
+    border-radius:50%;
+    filter:blur(80px);
+}
+
+.left-glow{left:-120px;background:#00aaff;}
+.right-glow{right:-120px;background:#6a00ff;}
+
+.card{
+    position:relative;
+    z-index:2;
+    width:380px;
+    text-align:center;
+    backdrop-filter:blur(12px);
+    background:rgba(15,15,15,.75);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:25px;
+    padding:30px;
+}
+
+.profile-container{
+    position:relative;
+    width:180px;
+    height:180px;
+    margin:auto;
+}
+
+.profile{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #00aaff;
+    box-shadow:0 0 25px #00aaff;
+}
+
+.ball{
+    position:absolute;
+    width:50px;
+    height:50px;
+    top:50%;
+    left:50%;
+    animation:orbit 6s linear infinite;
+    transform-origin:90px 90px;
+}
+
+@keyframes orbit{
+    from{transform:rotate(0deg) translateX(110px) rotate(0deg);}
+    to{transform:rotate(360deg) translateX(110px) rotate(-360deg);}
+}
+
+h1{
+    margin-top:20px;
+    color:white;
+    font-size:34px;
+    text-shadow:0 0 15px #00aaff;
+}
+
+.subtitle{
+    color:#cfcfcf;
+    margin:5px 0 20px;
+}
+
+.social{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.social a{
+    text-decoration:none;
+    color:white;
+    padding:14px;
+    border-radius:12px;
+    background:rgba(255,255,255,.08);
+}
+
+.controls{
+    margin-top:15px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+
+button{
+    padding:10px 14px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#00aaff;
+    color:white;
+    font-weight:bold;
+}
+
+#visitor{
+    margin-top:15px;
+    color:white;
+}
+
+.login{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.login-box{
+    background:#111;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    width:250px;
+}
+
+.login-box input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="left-glow"></div>
+<div class="right-glow"></div>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+    <div class="login-box">
+        <h3 style="color:white;">Login</h3>
+        <input id="user" placeholder="Username">
+        <button onclick="login()">Enter</button>
+    </div>
+</div>
+
+<!-- CARD -->
+<div class="card" id="card">
+
+    <div class="profile-container">
+        <img class="profile" src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Lionel_Messi.jpg">
+        <img class="ball" src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Soccerball.svg">
+    </div>
+
+    <h1 id="name">Pxlwyse</h1>
+    <p class="subtitle">Football Edition ⚽</p>
+
+    <div class="social">
+        <a href="https://www.instagram.com/q.pxo/?hl=ar" target="_blank">
+            <i class="fab fa-instagram"></i> Instagram
+        </a>
+
+        <a href="https://www.facebook.com/people/Emz-Zohir/pfbid0Y4mTNxW6vuLKJYzEYwseRymrqN7uNgFvVtBv5HpBfFvtr1aEA1rGXh6cT5VZ86Fql/" target="_blank">
+            <i class="fab fa-facebook"></i> Facebook
+        </a>
+
+        <a href="https://www.tiktok.com/@zouhiix_x9" target="_blank">
+            <i class="fab fa-tiktok"></i> TikTok
+        </a>
+    </div>
+
+    <div class="controls">
+        <button onclick="resetVisits()">🔄 Reset</button>
+    </div>
+
+    <div id="visitor">👁 Visitors: <span id="count">0</span></div>
+</div>
+
+<!-- 🎵 MUSIC (AURA-style ambient sound) -->
+<audio id="music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b8d3b5c7d.mp3?filename=tech-ambient-11065.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+let music = document.getElementById("music");
+music.volume = 0.5;
+
+/* 🎵 تشغيل الموسيقى عند أول نقرة */
+let started = false;
+
+document.addEventListener("click", () => {
+    if (!started) {
+        music.play();
+        started = true;
+    }
+});
+
+/* LOGIN */
+function login(){
+    let user = document.getElementById("user").value;
+    if(user.trim() !== ""){
+        document.getElementById("name").textContent = user;
+        document.getElementById("login").style.display = "none";
+    }
+}
+
+/* VISITS */
+let v = localStorage.getItem("visits");
+v = v ? parseInt(v) + 1 : 1;
+localStorage.setItem("visits", v);
+document.getElementById("count").textContent = v;
+
+/* RESET */
+function resetVisits(){
+    localStorage.setItem("visits",0);
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>
